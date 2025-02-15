@@ -202,6 +202,8 @@ local TeleportCheck = false
 plr.OnTeleport:Connect(function(state)
     if queueteleport and (not TeleportCheck) and settings.KeepOrangutag then
         TeleportCheck = true
-		queueteleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ownersalt2themandev/Scripts/refs/heads/main/Orangutag"))()')
+        queueteleport([[
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/ownersalt2themandev/Scripts/refs/heads/main/Orangutag"))()
+        ]])
     end
 end)
