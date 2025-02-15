@@ -122,8 +122,10 @@ Tab:AddToggle({
                 local pos = plr.Character.PrimaryPart.CFrame
 
                 for i, v in pairs(game.Players:GetPlayers()) do
-                    if v ~= plr then
-                        cf(v.Character.PrimaryPart.CFrame)
+                    if v ~= plr and v.Team == game.Teams.Runners then
+                        if v.Character.PrimaryPart then
+				cf(v.Character.PrimaryPart.CFrame)
+			end
                         task.wait()
                     end
                 end
