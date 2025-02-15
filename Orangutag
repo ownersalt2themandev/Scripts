@@ -14,6 +14,37 @@ local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (f
 
 local Window = OrionLib:MakeWindow({Name = "Orangutag | Fun Ruiner", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
 
+local defaultSettings = {
+    KeepOrangutag = true
+}
+
+local function loadSettings()
+    local settingsFile = "OrangutagSettings.json"
+    local success, data = pcall(function()
+        return readfile(settingsFile)
+    end)
+    
+    if success and data then
+        local loadedSettings = HttpService:JSONDecode(data)
+        return setmetatable(loadedSettings, {__index = defaultSettings})
+    else
+        return defaultSettings
+    end
+end
+
+local function saveSettings(settings)
+    local settingsFile = "OrangutagSettings.json"
+    local success, err = pcall(function()
+        writefile(settingsFile, HttpService:JSONEncode(settings))
+    end)
+    
+    if not success then
+        warn("Error saving settings:", err)
+    end
+end
+
+local settings = loadSettings()
+
 local function cf(cframe)
 	if plr.Character and plr.Character.PrimaryPart then
 		plr.Character:SetPrimaryPartCFrame(cframe)
@@ -121,6 +152,32 @@ Tab:AddToggle({
     end
 })
 
+Tab:AddToggle({
+	Default = settings.KeepOrangutag,
+    Callback = function(Value)
+        settings.KeepOrangutag = Value -- Update setting
+        saveSettings(settings) -- Save settings after update
+
+        print("Keep Orangutag is now set to:", Value)
+
+        if Value then
+            OrionLib:MakeNotification({
+                Name = "Keep Orangutag",
+                Content = "Turned On.",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+        else
+            OrionLib:MakeNotification({
+                Name = "Keep Orangutag",
+                Content = "Turned Off.",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+        end
+    end
+})
+
 local Tab2 = Window:MakeTab({
 	Name = "Credits",
 	Icon = "rbxasset://textures/AudioDiscovery/done.png",
@@ -137,7 +194,10 @@ plr.OnTeleport:Connect(function(state)
         if queueteleport and not TeleportCheck then
             TeleportCheck = true
             task.wait(2)
-            queueteleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ownersalt2themandev/Scripts/refs/heads/main/Orangutag"))()')
+
+            if settings.KeepOrangutag then
+                queueteleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ownersalt2themandev/Scripts/refs/heads/main/Orangutag"))()')
+            end
         end
     end
 end)
