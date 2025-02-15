@@ -131,6 +131,13 @@ Tab2:AddParagraph("Scripter","ownersalt2_theman [i didnt make OrionLib btw]")
 
 local TeleportCheck = false
 plr.OnTeleport:Connect(function(state)
-	TeleportCheck = true
-	queueteleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ownersalt2themandev/Scripts/refs/heads/main/Orangutag"))()')
+    if state == Enum.TeleportState.InProgress then
+        TeleportCheck = false
+    elseif state == Enum.TeleportState.Completed then
+        if queueteleport and not TeleportCheck then
+            TeleportCheck = true
+            task.wait(2)
+            queueteleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ownersalt2themandev/Scripts/refs/heads/main/Orangutag"))()')
+        end
+    end
 end)
