@@ -192,6 +192,58 @@ Tab:AddToggle({
     end
 })
 
+Tab:AddToggle({
+	Name = "Stay Safe",
+	Default = false,
+	Callback = function(Value)
+		getgenv().StaySafe = Value
+	end)
+})
+
+Tab:AddSlider({
+    Name = "Safe Distance",
+    Min = 0,
+    Max = 30,
+    Default = 15,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "studs",
+    Callback = function(Value)
+        if getgenv().StaySafe then
+            local function makeSafeSphere(player)
+                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local sphere = Instance.new("Part")
+                    sphere.Name = "Safe"
+                    sphere.Size = Vector3.new(Value, Value, Value)
+                    sphere.Color = player.TeamColor.Color
+                    sphere.Transparency = 0.7
+                    sphere.Anchored = true
+                    sphere.CanCollide = false
+                    sphere.Parent = player.Character
+                    sphere.Position = player.Character.HumanoidRootPart.Position
+                end
+            end
+
+            for _, player in pairs(game.Players:GetPlayers()) do
+                makeSafeSphere(player)
+            end
+
+            game.Players.PlayerAdded:Connect(function(player)
+                player.CharacterAdded:Connect(function()
+                    makeSafeSphere(player)
+                end)
+            end)
+
+            game.Players.PlayerRemoving:Connect(function(player)
+                local sphere = player.Character and player.Character:FindFirstChild("Safe")
+                if sphere then
+                    sphere:Destroy()
+                end
+            end)
+        end
+    end
+})
+
 local Tab2 = Window:MakeTab({
 	Name = "Credits",
 	Icon = "rbxasset://textures/AudioDiscovery/done.png",
