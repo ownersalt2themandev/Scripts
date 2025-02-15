@@ -153,10 +153,11 @@ Tab:AddToggle({
 })
 
 Tab:AddToggle({
+	Name "Keep Orangutag",
 	Default = settings.KeepOrangutag,
-    Callback = function(Value)
-        settings.KeepOrangutag = Value -- Update setting
-        saveSettings(settings) -- Save settings after update
+    	Callback = function(Value)
+        settings.KeepOrangutag = Value
+        saveSettings(settings)
 
         print("Keep Orangutag is now set to:", Value)
 
