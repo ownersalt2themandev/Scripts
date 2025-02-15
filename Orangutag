@@ -130,7 +130,7 @@ local Tab2 = Window:MakeTab({
 Tab2:AddParagraph("Scripter","ownersalt2_theman [i didnt make OrionLib btw]")
 
 local TeleportCheck = false
-plr.LocalPlayer.OnTeleport:Connect(function(state)
+plr.OnTeleport:Connect(function(state)
 	TeleportCheck = true
-	queueteleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/ownersalt2themandev/Scripts/refs/heads/main/Orangutag"))()]])
+	queueteleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ownersalt2themandev/Scripts/refs/heads/main/Orangutag"))()')
 end)
