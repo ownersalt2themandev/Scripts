@@ -1,4 +1,3 @@
---loadstring(game:HttpGet("https://raw.githubusercontent.com/ownersalt2themandev/Scripts/refs/heads/main/Orangutag"))()
 --[[
 Credits not needed u can remove :)
 Made by ownersalt2_theman
@@ -192,7 +191,6 @@ local TeleportCheck = false
 plr.OnTeleport:Connect(function(state)
     if queueteleport and (not TeleportCheck) and settings.KeepOrangutag then
         TeleportCheck = true
-        task.wait(2)
 		queueteleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ownersalt2themandev/Scripts/refs/heads/main/Orangutag"))()')
     end
 end)
