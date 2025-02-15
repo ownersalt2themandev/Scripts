@@ -57,19 +57,20 @@ end
 local settings = loadSettings()
 
 local function cf(cframe)
-	if plr.Character and plr.Character.PrimaryPart then
-		plr.Character:SetPrimaryPartCFrame(cframe)
-	end
+    if plr.Character and plr.Character.PrimaryPart then
+        plr.Character:SetPrimaryPartCFrame(cframe)
+    end
 end
 
 
 local Tab = Window:MakeTab({
-	Name = "Auto",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
+    Name = "Auto",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
 })
 
 local goConnections = {}
+local sphereConnections = {}
 
 Tab:AddToggle({
     Name = "Auto Tag",
@@ -87,49 +88,52 @@ Tab:AddToggle({
 
             local function go()
                 if not Value then return end
-				if httprequest and #game.Players:GetPlayers() <= 5 then
-        			local servers = {}
-        			local req = httprequest({Url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true", game.PlaceId)})
-        			local body = HttpService:JSONDecode(req.Body)
+                if httprequest and #game.Players:GetPlayers() <= 5 then
+                    local servers = {}
+                    local req = httprequest({Url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true", game.PlaceId)})
+                    local body = HttpService:JSONDecode(req.Body)
 
-        			if body and body.data then
-            			for i, v in next, body.data do
-                			if type(v) == "table" and tonumber(v.playing) and tonumber(v.maxPlayers) and v.playing < v.maxPlayers and v.id ~= JobId then
-                    			table.insert(servers, 1, v.id)
-                			end
-            			end
-        			end
+                    if body and body.data then
+                        for i, v in next, body.data do
+                            if type(v) == "table" and tonumber(v.playing) and tonumber(v.maxPlayers) and v.playing < v.maxPlayers and v.id ~= JobId then
+                                table.insert(servers, 1, v.id)
+                            end
+                        end
+                    end
 
-        			if #servers > 0 then
-            			TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], Players.LocalPlayer)
-        			else
-            			return OrionLib:MakeNotification({
-                		Name = "Server Hop [AUTO]",
-                		Content = "Couldn't find a server.",
-                		Image = "rbxassetid://4483345998",
-                		Time = 2
-            			})
-        			end
-    			else
-					OrionLib:MakeNotification({
-                		Name = "Server Hop [AUTO]",
-                		Content = "Waiting to get 5 players left to server hop.",
-                		Image = "rbxassetid://4483345998",
-                		Time = 2
-            			})
-    			end
+                    if #servers > 0 then
+                        TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], Players.LocalPlayer)
+                    else
+                        return OrionLib:MakeNotification({
+                            Name = "Server Hop [AUTO]",
+                            Content = "Couldn't find a server.",
+                            Image = "rbxassetid://4483345998",
+                            Time = 2
+                        })
+                    end
+                else
+                    OrionLib:MakeNotification({
+                        Name = "Server Hop [AUTO]",
+                        Content = "Waiting to get 5 players left to server hop.",
+                        Image = "rbxassetid://4483345998",
+                        Time = 2
+                    })
+                end
 
                 local pos = plr.Character.PrimaryPart.CFrame
 
                 for i, v in pairs(game.Players:GetPlayers()) do
                     if v ~= plr then
-                        if v.Character.PrimaryPart then
-				cf(v.Character.PrimaryPart.CFrame)
-			end
+                        if v.Character and v.Character.PrimaryPart then
+                            cf(v.Character.PrimaryPart.CFrame)
+                        end
                         task.wait()
                     end
                 end
-                plr.Character:SetPrimaryPartCFrame(pos)
+                
+                if plr.Character and plr.Character.PrimaryPart then
+                    plr.Character:SetPrimaryPartCFrame(pos)
+                end
             end
 
             local playerAddedConnection = game.Players.PlayerAdded:Connect(function(plr)
@@ -166,9 +170,9 @@ Tab:AddToggle({
 })
 
 Tab:AddToggle({
-	Name = "Keep Orangutag",
-	Default = settings.KeepOrangutag,
-    	Callback = function(Value)
+    Name = "Keep Orangutag",
+    Default = settings.KeepOrangutag,
+    Callback = function(Value)
         settings.KeepOrangutag = Value
         saveSettings(settings)
 
@@ -193,11 +197,29 @@ Tab:AddToggle({
 })
 
 Tab:AddToggle({
-	Name = "Stay Safe",
-	Default = false,
-	Callback = function(Value)
-		getgenv().StaySafe = Value
-	end)
+    Name = "Stay Safe",
+    Default = false,
+    Callback = function(Value)
+        getgenv().StaySafe = Value
+        
+        if not Value then
+            for _, connection in pairs(sphereConnections) do
+                if connection and typeof(connection) == "RBXScriptConnection" then
+                    connection:Disconnect()
+                end
+            end
+            sphereConnections = {}
+            
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player.Character then
+                    local sphere = player.Character:FindFirstChild("Safe")
+                    if sphere then
+                        sphere:Destroy()
+                    end
+                end
+            end
+        end
+    end
 })
 
 Tab:AddSlider({
@@ -207,20 +229,56 @@ Tab:AddSlider({
     Default = 15,
     Color = Color3.fromRGB(255,255,255),
     Increment = 1,
-    ValueName = "studs",
+    ValueName = "Studs",
     Callback = function(Value)
         if getgenv().StaySafe then
+            for _, connection in pairs(sphereConnections) do
+                if connection and typeof(connection) == "RBXScriptConnection" then
+                    connection:Disconnect()
+                end
+            end
+            sphereConnections = {}
+            
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player.Character then
+                    local sphere = player.Character:FindFirstChild("Safe")
+                    if sphere then
+                        sphere:Destroy()
+                    end
+                end
+            end
+            
             local function makeSafeSphere(player)
                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local existingSphere = player.Character:FindFirstChild("Safe")
+                    if existingSphere then
+                        existingSphere:Destroy()
+                    end
+                    
                     local sphere = Instance.new("Part")
                     sphere.Name = "Safe"
                     sphere.Size = Vector3.new(Value, Value, Value)
+                    sphere.Shape = Enum.PartType.Ball
                     sphere.Color = player.TeamColor.Color
                     sphere.Transparency = 0.7
-                    sphere.Anchored = true
-                    sphere.CanCollide = false
+                    sphere.Anchored = false
+                    sphere.CanCollide = true
                     sphere.Parent = player.Character
                     sphere.Position = player.Character.HumanoidRootPart.Position
+                    
+                    local weld = Instance.new("WeldConstraint")
+                    weld.Name = "SafeWeld"
+                    weld.Part0 = sphere
+                    weld.Part1 = player.Character.HumanoidRootPart
+                    weld.Parent = sphere
+                    
+                    local characterRemovedConnection = player.CharacterRemoving:Connect(function()
+                        if sphere and sphere.Parent then
+                            sphere:Destroy()
+                        end
+                    end)
+                    
+                    table.insert(sphereConnections, characterRemovedConnection)
                 end
             end
 
@@ -228,29 +286,42 @@ Tab:AddSlider({
                 makeSafeSphere(player)
             end
 
-            game.Players.PlayerAdded:Connect(function(player)
+            local playerAddedConnection = game.Players.PlayerAdded:Connect(function(player)
                 player.CharacterAdded:Connect(function()
-                    makeSafeSphere(player)
+                    if getgenv().StaySafe then
+                        makeSafeSphere(player)
+                    end
                 end)
             end)
+            table.insert(sphereConnections, playerAddedConnection)
 
-            game.Players.PlayerRemoving:Connect(function(player)
+            local playerRemovingConnection = game.Players.PlayerRemoving:Connect(function(player)
                 local sphere = player.Character and player.Character:FindFirstChild("Safe")
                 if sphere then
                     sphere:Destroy()
                 end
             end)
+            table.insert(sphereConnections, playerRemovingConnection)
+            
+            for _, player in pairs(game.Players:GetPlayers()) do
+                local characterAddedConnection = player.CharacterAdded:Connect(function()
+                    if getgenv().StaySafe then
+                        makeSafeSphere(player)
+                    end
+                end)
+                table.insert(sphereConnections, characterAddedConnection)
+            end
         end
     end
 })
 
 local Tab2 = Window:MakeTab({
-	Name = "Credits",
-	Icon = "rbxasset://textures/AudioDiscovery/done.png",
-	PremiumOnly = false
+    Name = "Credits",
+    Icon = "rbxasset://textures/AudioDiscovery/done.png",
+    PremiumOnly = false
 })
 
-Tab2:AddParagraph("Scripter","ownersalt2_theman [i didnt make OrionLib btw]")
+Tab2:AddParagraph("Scripter", "ownersalt2_theman [i didnt make OrionLib btw]")
 
 local TeleportCheck = false
 plr.OnTeleport:Connect(function(state)
