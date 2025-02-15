@@ -1,7 +1,4 @@
 --[[
-	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
-]]
---[[
 Credits not needed u can remove :)
 Made by ownersalt2_theman
 ]]
@@ -135,5 +132,5 @@ Tab2:AddParagraph("Scripter","ownersalt2_theman [i didnt make OrionLib btw]")
 local TeleportCheck = false
 plr.LocalPlayer.OnTeleport:Connect(function(state)
 	TeleportCheck = true
-	--queueteleport([[loadstring(game:HttpGet("blabla"))]])
+	queueteleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/ownersalt2themandev/Scripts/refs/heads/main/Orangutag"))()]])
 end)
