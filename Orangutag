@@ -1,0 +1,139 @@
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+--[[
+Credits not needed u can remove :)
+Made by ownersalt2_theman
+]]
+
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+
+local plr = game.Players.LocalPlayer
+local httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
+
+local Window = OrionLib:MakeWindow({Name = "Orangutag | Fun Ruiner", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+
+local function cf(cframe)
+	if plr.Character and plr.Character.PrimaryPart then
+		plr.Character:SetPrimaryPartCFrame(cframe)
+	end
+end
+
+
+local Tab = Window:MakeTab({
+	Name = "Auto",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local goConnections = {}
+
+Tab:AddToggle({
+    Name = "Auto Tag",
+    Default = false,
+    Callback = function(Value)
+        print("Toggle Value:", Value)
+
+        if Value then
+            OrionLib:MakeNotification({
+                Name = "Auto Tag",
+                Content = "Turned On.",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+
+            local function go()
+                if not Value then return end
+				if httprequest and #game.Players:GetPlayers() <= 5 then
+        			local servers = {}
+        			local req = httprequest({Url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true", game.PlaceId)})
+        			local body = HttpService:JSONDecode(req.Body)
+
+        			if body and body.data then
+            			for i, v in next, body.data do
+                			if type(v) == "table" and tonumber(v.playing) and tonumber(v.maxPlayers) and v.playing < v.maxPlayers and v.id ~= JobId then
+                    			table.insert(servers, 1, v.id)
+                			end
+            			end
+        			end
+
+        			if #servers > 0 then
+            			TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], Players.LocalPlayer)
+        			else
+            			return OrionLib:MakeNotification({
+                		Name = "Server Hop [AUTO]",
+                		Content = "Couldn't find a server.",
+                		Image = "rbxassetid://4483345998",
+                		Time = 2
+            			})
+        			end
+    			else
+					OrionLib:MakeNotification({
+                		Name = "Server Hop [AUTO]",
+                		Content = "Waiting to get 5 players left to server hop.",
+                		Image = "rbxassetid://4483345998",
+                		Time = 2
+            			})
+    			end
+
+                local pos = plr.Character.PrimaryPart.CFrame
+
+                for i, v in pairs(game.Players:GetPlayers()) do
+                    if v ~= plr then
+                        cf(v.Character.PrimaryPart.CFrame)
+                        task.wait()
+                    end
+                end
+                plr.Character:SetPrimaryPartCFrame(pos)
+            end
+
+            local playerAddedConnection = game.Players.PlayerAdded:Connect(function(plr)
+                plr:GetPropertyChangedSignal("Team"):Connect(function()
+                    go()
+                end)
+            end)
+
+            table.insert(goConnections, playerAddedConnection)
+
+            for i, v in pairs(game.Players:GetPlayers()) do
+                local playerTeamChangeConnection = v:GetPropertyChangedSignal("Team"):Connect(function()
+                    go()
+                end)
+                table.insert(goConnections, playerTeamChangeConnection)
+            end
+
+            go()
+
+        else
+            OrionLib:MakeNotification({
+                Name = "Auto Tag",
+                Content = "Turned Off.",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+
+            for _, connection in pairs(goConnections) do
+                connection:Disconnect()
+            end
+            goConnections = {}
+        end
+    end
+})
+
+local Tab2 = Window:MakeTab({
+	Name = "Credits",
+	Icon = "rbxasset://textures/AudioDiscovery/done.png",
+	PremiumOnly = false
+})
+
+Tab2:AddParagraph("Scripter","ownersalt2_theman [i didnt make OrionLib btw]")
+
+local TeleportCheck = false
+plr.LocalPlayer.OnTeleport:Connect(function(state)
+	TeleportCheck = true
+	--queueteleport([[loadstring(game:HttpGet("blabla"))]])
+end)
