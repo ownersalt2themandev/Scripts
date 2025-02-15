@@ -249,7 +249,7 @@ Tab:AddSlider({
             end
             
             local function makeSafeSphere(player)
-                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player ~= plr then
                     local existingSphere = player.Character:FindFirstChild("Safe")
                     if existingSphere then
                         existingSphere:Destroy()
