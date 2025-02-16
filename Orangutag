@@ -197,7 +197,7 @@ Tab:AddToggle({
 })
 
 Tab:AddToggle({
-    Name = "Stay Safe",
+    Name = "Stay Safe [WIP]",
     Default = false,
     Callback = function(Value)
         getgenv().StaySafe = Value
