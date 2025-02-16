@@ -263,6 +263,7 @@ Tab:AddSlider({
                     sphere.Transparency = 0.7
                     sphere.Anchored = false
                     sphere.CanCollide = true
+                    sphere.Massless = true
                     sphere.Parent = player.Character
                     sphere.Position = player.Character.HumanoidRootPart.Position
                     
