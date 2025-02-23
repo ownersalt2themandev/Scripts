@@ -1,0 +1,25 @@
+--[[
+Credits not needed u can remove :)
+Made by ownersalt2_theman
+]]
+
+local plr = game.Players.LocalPlayer
+
+local function setAutoRotate()
+    local char = plr.Character or plr.CharacterAdded:Wait()
+    local humanoid = char:WaitForChild("Humanoid")
+    local humanoidRootPart = char:WaitForChild("HumanoidRootPart")
+    
+    humanoid.AutoRotate = true
+    
+
+    humanoid:GetPropertyChangedSignal("AutoRotate"):Connect(function()
+        humanoid.AutoRotate = true
+    end)
+end
+
+plr.CharacterAdded:Connect(setAutoRotate)
+
+if plr.Character then
+    setAutoRotate()
+end
