@@ -11,6 +11,16 @@ local function setAutoRotate()
     local humanoidRootPart = char:WaitForChild("HumanoidRootPart")
     
     humanoid.AutoRotate = true
+
+    if getgenv().TSB = true then
+        workspace.CurrentCamera:remove()
+	    wait(.01)
+	    repeat wait() until char ~= nil
+	    workspace.CurrentCamera.CameraSubject = char:FindFirstChildWhichIsA('Humanoid')
+	    workspace.CurrentCamera.CameraType = "Custom"
+	    plr.CameraMode = "Classic"
+	    char.Head.Anchored = false
+    end
     
 
     humanoid:GetPropertyChangedSignal("AutoRotate"):Connect(function()
