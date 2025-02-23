@@ -13,13 +13,15 @@ local function setAutoRotate()
     humanoid.AutoRotate = true
 
     if getgenv().TSB then
-	workspace.CurrentCamera:remove()
-	wait(.01)
-	repeat wait() until char ~= nil
-	workspace.CurrentCamera.CameraSubject = char:FindFirstChildWhichIsA('Humanoid')
-	workspace.CurrentCamera.CameraType = "Custom"
-	plr.CameraMode = "Classic"
-	char.Head.Anchored = false
+	workspace.CurrentCamera:GetPropertyChangedSignal("CameraType"):Connect(function()
+		workspace.CurrentCamera:remove()
+		wait(.01)
+		repeat wait() until char ~= nil
+		workspace.CurrentCamera.CameraSubject = char:FindFirstChildWhichIsA('Humanoid')
+		workspace.CurrentCamera.CameraType = "Custom"
+		plr.CameraMode = "Classic"
+		char.Head.Anchored = false
+	end)
     end
     
 
