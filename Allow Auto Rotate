@@ -13,20 +13,21 @@ local function setAutoRotate()
     humanoid.AutoRotate = true
 
     if getgenv().TSB then
-	workspace.CurrentCamera:GetPropertyChangedSignal("CameraType"):Connect(function()
-		workspace.CurrentCamera:remove()
-		wait(.01)
-		repeat wait() until char ~= nil
-		workspace.CurrentCamera.CameraSubject = char:FindFirstChildWhichIsA('Humanoid')
-		workspace.CurrentCamera.CameraType = "Custom"
-		plr.CameraMode = "Classic"
-		char.Head.Anchored = false
-	end)
+        workspace.CurrentCamera:GetPropertyChangedSignal("CameraType"):Connect(function()
+            if workspace.CurrentCamera.CameraType ~= Enum.CameraType.Custom then
+                workspace.CurrentCamera.CameraSubject = char:FindFirstChildWhichIsA('Humanoid')
+                workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+                plr.CameraMode = "Classic"
+                char.Head.Anchored = false
+            end
+        end)
     end
-    
 
-    humanoid:GetPropertyChangedSignal("AutoRotate"):Connect(function()
-        humanoid.AutoRotate = true
+    task.spawn(function()
+        -- This will continuously ensure AutoRotate is set to true
+        humanoid:GetPropertyChangedSignal("AutoRotate"):Connect(function()
+            humanoid.AutoRotate = true
+        end)
     end)
 end
 
